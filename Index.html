@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-M">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator BMI</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #f4f4f4; /* Light Gray */
+            --text-color: #333;
+            --card-bg: #fff;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        header p {
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .gender-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+
+        .gender-selector label {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .gender-selector input[type="radio"] {
+            display: none; /* Sembunyikan radio button asli */
+        }
+
+        .gender-selector input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .gender-selector label:hover {
+            background-color: #e0e0e0;
+        }
+
+        .gender-selector input[type="radio"]:checked + label:hover {
+            background-color: #45a049; /* Slightly darker green on hover when checked */
+        }
+
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker green */
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .result h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .result p {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .result p#bmi-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .result p#bmi-category {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            margin-left: 5px;
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            text-align: left;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none; /* Sembunyikan secara default */
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 600px) {
+            .container {
+                padding: 40px;
+            }
+            header h1 {
+                font-size: 2.5em;
+            }
+            .gender-selector label {
+                padding: 12px 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Kalkulator BMI 🏃‍♀️🍎</h1>
+            <p>Hitung Indeks Massa Tubuh Anda dengan mudah dan cepat!</p>
+        </header>
+
+        <form id="bmiForm">
+            <div class="input-group">
+                <label for="gender">Jenis Kelamin</label>
+                <div class="gender-selector">
+                    <input type="radio" id="male" name="gender" value="male" checked>
+                    <label for="male">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-male" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2H9.5zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+                        </svg>
+                        Pria
+                    </label>
+
+                    <input type="radio" id="female" name="gender" value="female">
+                    <label for="female">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-female" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M8 1a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM3 5a5 5 0 1 1 5.5 4.975V12h2a.5.5 0 0 1 0 1h-2v2.5a.5.5 0 0 1-1 0V13H5a.5.5 0 0 1 0-1h1.5v-2.025A5 5 0 0 1 3 5z"/>
+                        </svg>
+                        Wanita
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="weight">Berat Badan (kg)</label>
+                <input type="number" id="weight" placeholder="Contoh: 70" required>
+                <div class="error-message" id="weightError">Harap masukkan berat badan yang valid.</div>
+            </div>
+
+            <div class="input-group">
+                <label for="height">Tinggi Badan (cm)</label>
+                <input type="number" id="height" placeholder="Contoh: 175" required>
+                <div class="error-message" id="heightError">Harap masukkan tinggi badan yang valid.</div>
+            </div>
+
+            <button type="submit">Hitung BMI 💪</button>
+        </form>
+
+        <div class="result" id="resultSection" style="display: none;">
+            <h2>Hasil BMI Anda:</h2>
+            <p id="bmi-value"></p>
+            <p id="bmi-category"></p>
+            <p style="font-size: 0.8em; margin-top: 15px;">
+                Ini adalah perkiraan. Konsultasikan dengan profesional kesehatan untuk informasi lebih lanjut.
+                <span class="info-icon" onclick="openModal()">ℹ️</span>
+            </p>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Informasi Kategori BMI</h2>
+            <p><strong>Di bawah 18.5:</strong> Berat badan kurang</p>
+            <p><strong>18.5 – 24.9:</strong> Berat badan ideal</p>
+            <p><strong>25.0 – 29.9:</strong> Berat badan berlebih</p>
+            <p><strong>30.0 ke atas:</strong> Obesitas</p>
+            <hr style="margin: 15px 0;">
+            <p style="font-size:0.9em;">Indeks Massa Tubuh (BMI) adalah nilai yang berasal dari massa (berat) dan tinggi seseorang. BMI adalah cara yang mudah untuk memperkirakan apakah seseorang memiliki berat badan yang sehat untuk tinggi badannya. Namun, BMI tidak mengukur lemak tubuh secara langsung dan sebaiknya tidak digunakan sebagai satu-satunya alat diagnostik.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p style="font-size: 0.8em; color: #777; margin-top: 20px;">
+            &copy; <span id="currentYear"></span> Kalkulator BMI. Dibuat dengan ❤️.
+        </p>
+    </footer>
+
+    <script>
+        const bmiForm = document.getElementById('bmiForm');
+        const weightInput = document.getElementById('weight');
+        const heightInput = document.getElementById('height');
+        const resultSection = document.getElementById('resultSection');
+        const bmiValueElement = document.getElementById('bmi-value');
+        const bmiCategoryElement = document.getElementById('bmi-category');
+        const weightError = document.getElementById('weightError');
+        const heightError = document.getElementById('heightError');
+        const currentYearElement = document.getElementById('currentYear');
+
+        currentYearElement.textContent = new Date().getFullYear();
+
+        bmiForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form submit default
+
+            const weight = parseFloat(weightInput.value);
+            const height = parseFloat(heightInput.value);
+            let isValid = true;
+
+            // Validasi input
+            if (isNaN(weight) || weight <= 0) {
+                weightError.style.display = 'block';
+                weightInput.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                weightError.style.display = 'none';
+                weightInput.style.borderColor = '#ddd';
+            }
+
+            if (isNaN(height) || height <= 0) {
+                heightError.style.display = 'block';
+                heightInput.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                heightError.style.display = 'none';
+                heightInput.style.borderColor = '#ddd';
+            }
+
+            if (!isValid) {
+                resultSection.style.display = 'none';
+                return;
+            }
+
+            // Hitung BMI: berat (kg) / (tinggi (m))^2
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            const bmiRounded = bmi.toFixed(1); // Bulatkan ke 1 desimal
+
+            bmiValueElement.textContent = bmiRounded;
+
+            let category = '';
+            let categoryColor = '';
+
+            if (bmi < 18.5) {
+                category = 'Berat badan kurang';
+                categoryColor = '#2196F3'; // Blue
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                category = 'Berat badan ideal 👍';
+                categoryColor = 'var(--primary-color)'; // Green
+            } else if (bmi >= 25 && bmi <= 29.9) {
+                category = 'Berat badan berlebih';
+                categoryColor = '#FFC107'; // Amber
+            } else {
+                category = 'Obesitas 😮';
+                categoryColor = '#F44336'; // Red
+            }
+
+            bmiCategoryElement.textContent = category;
+            bmiCategoryElement.style.color = categoryColor;
+            bmiValueElement.style.color = categoryColor;
+            resultSection.style.display = 'block';
+
+            // Scroll ke hasil
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Modal functions
+        const modal = document.getElementById('infoModal');
+        function openModal() {
+            modal.style.display = "block";
+        }
+        function closeModal() {
+            modal.style.display = "none";
+        }
+        // Tutup modal jika klik di luar kontennya
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Reset error messages on input
+        weightInput.addEventListener('input', () => {
+            if (weightError.style.display === 'block') {
+                weightError.style.display = 'none';
+                weightInput.style.borderColor = '#ddd';
+            }
+        });
+
+        heightInput.addEventListener('input', () => {
+            if (heightError.style.display === 'block') {
+                heightError.style.display = 'none';
+                heightInput.style.borderColor = '#ddd';
+            }
+        });
+
+    </script>
+</body>
+</html>
